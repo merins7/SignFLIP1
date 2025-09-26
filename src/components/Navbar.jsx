@@ -7,6 +7,7 @@ export default function Navbar() {
   const links = [
     { name: "Home", path: "/" },
     { name: "Flash Cards", path: "/flashcards" },
+   
     { name: "Quiz", path: "/quiz" },
     { name: "Settings", path: "/settings" },
   ];

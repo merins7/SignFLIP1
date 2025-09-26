@@ -1,61 +1,69 @@
 import React, { useState } from "react";
 
-const FlipCard = () => {
+const FlashcardApp = () => {
   const [input, setInput] = useState("");
-  const [image, setImage] = useState("");
+  const [card, setCard] = useState(null);
   const [flipped, setFlipped] = useState(false);
-  const [showCard, setShowCard] = useState(false);
+  const [mode, setMode] = useState("asl"); // 'asl' or 'words'
 
-  // Images for A–Z & 0–9
-  const images = {
-    A: "/signs/A.png", B: "/signs/B.png", C: "/signs/C.png", D: "/signs/D.png",
-    E: "/signs/E.png", F: "/signs/F.png", G: "/signs/G.png", H: "/signs/H.png",
-    I: "/signs/I.png", J: "/signs/J.png", K: "/signs/K.png", L: "/signs/L.png",
-    M: "/signs/M.png", N: "/signs/N.png", O: "/signs/O.png", P: "/signs/P.png",
-    Q: "/signs/Q.png", R: "/signs/R.png", S: "/signs/S.png", T: "/signs/T.png",
-    U: "/signs/U.png", V: "/signs/V.png", W: "/signs/W.png", X: "/signs/X.png",
-    Y: "/signs/Y.png", Z: "/signs/Z.png",
-    "0": "/signs/0.png", "1": "/signs/1.png", "2": "/signs/2.png", "3": "/signs/3.png",
-    "4": "/signs/4.png", "5": "/signs/5.png", "6": "/signs/6.png", "7": "/signs/7.png",
-    "8": "/signs/8.png", "9": "/signs/9.png"
+  // ASL letters & numbers
+  const asl = {
+    A: { image: "/signs/A.png", audio: "/audio/A.mp3" },
+    B: { image: "/signs/B.png", audio: "/audio/B.mp3" },
+    C: { image: "/signs/C.png", audio: "/audio/C.mp3" },
+    "1": { image: "/signs/1.png", audio: "/audio/1.mp3" },
+    "2": { image: "/signs/2.png", audio: "/audio/2.mp3" },
+    // Add all letters A-Z & numbers 0-9
   };
 
-  // Audio for A–Z & 0–9
-  const audioFiles = {
-    A: "/audio/A.mp3", B: "/audio/B.mp3", C: "/audio/C.mp3", D: "/audio/D.mp3",
-    E: "/audio/E.mp3", F: "/audio/F.mp3", G: "/audio/G.mp3", H: "/audio/H.mp3",
-    I: "/audio/I.mp3", J: "/audio/J.mp3", K: "/audio/K.mp3", L: "/audio/L.mp3",
-    M: "/audio/M.mp3", N: "/audio/N.mp3", O: "/audio/O.mp3", P: "/audio/P.mp3",
-    Q: "/audio/Q.mp3", R: "/audio/R.mp3", S: "/audio/S.mp3", T: "/audio/T.mp3",
-    U: "/audio/U.mp3", V: "/audio/V.mp3", W: "/audio/W.mp3", X: "/audio/X.mp3",
-    Y: "/audio/Y.mp3", Z: "/audio/Z.mp3",
-    "0": "/audio/0.mp3", "1": "/audio/1.mp3", "2": "/audio/2.mp3", "3": "/audio/3.mp3",
-    "4": "/audio/4.mp3", "5": "/audio/5.mp3", "6": "/audio/6.mp3", "7": "/audio/7.mp3",
-    "8": "/audio/8.mp3", "9": "/audio/9.mp3"
+  // Word flashcards (all inside /signs folder)
+  const words = {
+    HELLO: { image: "/signs/hello.gif", audio: "/audio/hello.mp3" },
+    LOVE: { image: "/signs/love.gif", audio: "/audio/love.mp3" },
+    FRIEND: { image: "/signs/friend.gif", audio: "/audio/friend.mp3" },
+    THANKYOU: { image: "/signs/thankyou.gif", audio: "/audio/thankyou.mp3" },
+    SORRY: { image: "/signs/sorry.gif", audio: "/audio/sorry.mp3" },
+    LEARN: { image: "/signs/learn.gif", audio: "/audio/learn.mp3" },
+    SCHOOL: { image: "/signs/school.gif", audio: "/audio/school.mp3" },
+    BOOK: { image: "/signs/book.gif", audio: "/audio/book.mp3" },
+    MUSIC: { image: "/signs/music.gif", audio: "/audio/music.mp3" },
+    COMPUTER: { image: "/signs/computer.gif", audio: "/audio/computer.mp3" },
   };
 
-  const handleShowImage = () => {
-    const char = input.toUpperCase();
-    if (images[char]) {
-      setImage(images[char]);
+  const handleShowCard = () => {
+    const val = input.toUpperCase().trim();
+    if (mode === "asl" && asl[val]) {
+      setCard({ type: "asl", value: val, ...asl[val] });
       setFlipped(false);
-      setShowCard(true);
+    } else if (mode === "words" && words[val]) {
+      setCard({ type: "word", value: val, ...words[val] });
+      setFlipped(false);
     } else {
-      alert("Please enter a valid letter (A-Z) or number (0-9).");
-      setShowCard(false);
+      alert(
+        mode === "asl"
+          ? "Enter a valid ASL letter (A-Z) or number (0-9)."
+          : "Enter a valid word (HELLO, LOVE, FRIEND, etc.)"
+      );
+      setCard(null);
     }
   };
 
   const handleFlip = () => {
     setFlipped(!flipped);
-    const char = input.toUpperCase();
-    if (audioFiles[char]) {
-      new Audio(audioFiles[char]).play();
+    if (card?.audio) {
+      new Audio(card.audio).play();
     }
   };
 
+  const switchMode = () => {
+    setMode(mode === "asl" ? "words" : "asl");
+    setInput("");
+    setCard(null);
+    setFlipped(false);
+  };
+
   return (
-    <div className="relative flex flex-col items-center justify-center h-screen overflow-hidden">
+    <div className="relative flex items-center justify-center min-h-screen overflow-hidden">
       {/* Background Video */}
       <video
         autoPlay
@@ -65,21 +73,49 @@ const FlipCard = () => {
         className="absolute top-0 left-0 w-full h-full object-cover z-[-2]"
       >
         <source src="/video/m.mp4" type="video/mp4" />
-        Your browser does not support the video tag.
       </video>
 
-      {/* Dark Overlay */}
-      <div className="absolute top-0 left-0 w-full h-full bg-black/40 z-[-1]" />
+      {/* Dark overlay */}
+      <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-[-1]" />
 
       {/* Content */}
-      <div className="flex flex-col items-center px-6 text-center">
-        <h2 className="mb-6 text-4xl font-extrabold drop-shadow-lg">
-          Sign Language Flip Card
-        </h2>
+      <div className="flex flex-col items-center justify-center w-full max-w-xl px-6 py-12 text-center">
+        <h1 className="mb-6 text-4xl font-extrabold text-white drop-shadow-lg">
+          Flashcard Learning ({mode.toUpperCase()})
+        </h1>
 
-        {/* Show Card */}
-        {showCard && (
-          <div className="flex flex-col items-center mb-8 space-y-4">
+        {/* Switch Mode Button */}
+        <button
+          onClick={switchMode}
+          className="px-6 py-2 mb-6 text-white transition bg-purple-600 rounded-lg hover:bg-purple-500"
+        >
+          {mode === "asl" ? "Switch to Words" : "Switch to ASL"}
+        </button>
+
+        {/* Input */}
+        <div className="flex justify-center w-full mb-8 space-x-4">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder={
+              mode === "asl"
+                ? "Enter A-Z or 0-9"
+                : "Enter a word (HELLO, LOVE, FRIEND, etc.)"
+            }
+            className="flex-1 px-4 py-2 text-lg rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          <button
+            onClick={handleShowCard}
+            className="px-6 py-2 text-white transition bg-blue-600 rounded-lg hover:bg-blue-500"
+          >
+            Show
+          </button>
+        </div>
+
+        {/* Flashcard */}
+        {card && (
+          <div className="flex flex-col items-center justify-center space-y-4">
             <div
               className="w-[350px] h-[350px] cursor-pointer perspective"
               onClick={handleFlip}
@@ -93,47 +129,29 @@ const FlipCard = () => {
                 {/* Front */}
                 <div className="absolute flex items-center justify-center w-full h-full overflow-hidden bg-white rounded-lg shadow-xl backface-hidden">
                   <img
-                    src={image}
-                    alt="Card Front"
+                    src={card.image}
+                    alt={card.value}
                     className="object-cover w-full h-full"
                   />
                 </div>
 
                 {/* Back */}
-                <div className="absolute flex items-center justify-center w-full h-full font-bold text-white bg-yellow-900 rounded-lg shadow-xl text-8xl rotate-y-180 backface-hidden">
-                  {input.toUpperCase()}
+                <div className="absolute flex items-center justify-center w-full h-full text-6xl font-bold text-white bg-yellow-900 rounded-lg shadow-xl backface-hidden rotate-y-180">
+                  {card.value}
                 </div>
               </div>
             </div>
             <button
               onClick={handleFlip}
-              className="px-6 py-2 text-white transition-transform bg-green-900 rounded-lg shadow-lg hover:bg-green-600 hover:scale-105"
+              className="px-6 py-2 text-white transition bg-green-700 rounded-lg hover:bg-green-600"
             >
               Flip & Play Audio
             </button>
           </div>
         )}
-
-        {/* Input */}
-        <div className="flex p-4 space-x-3 shadow-lg bg-white/90 backdrop-blur-md rounded-xl">
-          <input
-            type="text"
-            maxLength={1}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Enter A-Z or 0-9"
-            className="px-3 py-2 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-          <button
-            onClick={handleShowImage}
-            className="px-6 py-2 text-white transition-transform bg-blue-900 rounded-lg shadow-lg hover:bg-blue-600 hover:scale-105"
-          >
-            Show
-          </button>
-        </div>
       </div>
     </div>
   );
 };
 
-export default FlipCard;
+export default FlashcardApp;

@@ -1,110 +1,104 @@
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import Navbar from "../components/Navbar";
+import { useState } from "react";
 
 export default function Settings() {
-  // States
-  const [theme, setTheme] = useState("light");
-  const [animation, setAnimation] = useState("flip");
-  const [fontSize, setFontSize] = useState("medium");
-
-  // Load saved settings from localStorage
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    const savedAnimation = localStorage.getItem("animation");
-    const savedFontSize = localStorage.getItem("fontSize");
-
-    if (savedTheme) setTheme(savedTheme);
-    if (savedAnimation) setAnimation(savedAnimation);
-    if (savedFontSize) setFontSize(savedFontSize);
-
-    document.documentElement.classList.toggle("dark", savedTheme === "dark");
-  }, []);
-
-  // Save settings to localStorage
-  useEffect(() => {
-    localStorage.setItem("theme", theme);
-    localStorage.setItem("animation", animation);
-    localStorage.setItem("fontSize", fontSize);
-    document.documentElement.classList.toggle("dark", theme === "dark");
-  }, [theme, animation, fontSize]);
+  const [darkMode, setDarkMode] = useState(false);
+  const [notifications, setNotifications] = useState(true);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="flex items-center justify-center min-h-screen px-6 py-10 bg-gray-100 dark:bg-gray-900"
+    <div
+      className={`relative min-h-screen text-white ${
+        darkMode
+          ? "bg-gray-900"
+          : "bg-gradient-to-br from-purple-600 via-pink-500 to-red-400"
+      }`}
     >
-      <div className="w-full max-w-lg p-8 bg-white shadow-lg dark:bg-gray-800 rounded-2xl">
-        <h2 className="mb-6 text-2xl font-bold text-center text-gray-800 dark:text-white">
-          Settings ⚙️
-        </h2>
+      <Navbar />
+      <div className="flex flex-col items-center px-6 pt-28">
+        <h1 className="mb-6 text-3xl font-bold">Settings</h1>
 
-        {/* Theme Switch */}
-        <div className="mb-6">
-          <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
-            Theme
-          </label>
-          <select
-            value={theme}
-            onChange={(e) => setTheme(e.target.value)}
-            className="w-full px-4 py-2 text-gray-800 bg-gray-100 border rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:outline-none"
-          >
-            <option value="light">🌞 Light</option>
-            <option value="dark">🌙 Dark</option>
-          </select>
-        </div>
+        <div className="w-full max-w-xl p-6 space-y-6 shadow-lg bg-white/10 rounded-2xl">
+          {/* Profile Section */}
+          <div>
+            <h2 className="mb-2 text-xl font-semibold">Profile</h2>
+            <div className="flex flex-col space-y-3">
+              <input
+                type="text"
+                placeholder="Update Username"
+                className="px-4 py-2 text-black rounded-lg"
+              />
+              <input
+                type="email"
+                placeholder="Update Email"
+                className="px-4 py-2 text-black rounded-lg"
+              />
+              <button className="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600">
+                Save Profile
+              </button>
+            </div>
+          </div>
 
-        {/* Animation Type */}
-        <div className="mb-6">
-          <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
-            Flashcard Animation
-          </label>
-          <select
-            value={animation}
-            onChange={(e) => setAnimation(e.target.value)}
-            className="w-full px-4 py-2 text-gray-800 bg-gray-100 border rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:outline-none"
-          >
-            <option value="flip">🔄 Flip</option>
-            <option value="slide">➡️ Slide</option>
-            <option value="fade">✨ Fade</option>
-          </select>
-        </div>
+          {/* Change Password */}
+          <div>
+            <h2 className="mb-2 text-xl font-semibold">Change Password</h2>
+            <div className="flex flex-col space-y-3">
+              <input
+                type="password"
+                placeholder="Current Password"
+                className="px-4 py-2 text-black rounded-lg"
+              />
+              <input
+                type="password"
+                placeholder="New Password"
+                className="px-4 py-2 text-black rounded-lg"
+              />
+              <input
+                type="password"
+                placeholder="Confirm New Password"
+                className="px-4 py-2 text-black rounded-lg"
+              />
+              <button className="px-4 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600">
+                Update Password
+              </button>
+            </div>
+          </div>
 
-        {/* Font Size */}
-        <div className="mb-6">
-          <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
-            Font Size
-          </label>
-          <select
-            value={fontSize}
-            onChange={(e) => setFontSize(e.target.value)}
-            className="w-full px-4 py-2 text-gray-800 bg-gray-100 border rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:outline-none"
-          >
-            <option value="small">🔹 Small</option>
-            <option value="medium">🔸 Medium</option>
-            <option value="large">🔶 Large</option>
-          </select>
-        </div>
+          {/* Preferences */}
+          <div>
+            <h2 className="mb-2 text-xl font-semibold">Preferences</h2>
+            <div className="flex flex-col space-y-4">
+              {/* Dark Mode Toggle */}
+              <label className="flex items-center justify-between cursor-pointer">
+                <span>Dark Mode</span>
+                <input
+                  type="checkbox"
+                  checked={darkMode}
+                  onChange={() => setDarkMode(!darkMode)}
+                  className="w-5 h-5"
+                />
+              </label>
 
-        {/* Preview Section */}
-        <div className="p-6 mt-8 text-center border rounded-lg dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
-          <p
-            className={`${
-              fontSize === "small"
-                ? "text-sm"
-                : fontSize === "medium"
-                ? "text-lg"
-                : "text-2xl"
-            } text-gray-900 dark:text-gray-100`}
-          >
-            Preview Flashcard Text
-          </p>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            (Animation: {animation}, Theme: {theme})
-          </p>
+              {/* Notifications Toggle */}
+              <label className="flex items-center justify-between cursor-pointer">
+                <span>Enable Notifications</span>
+                <input
+                  type="checkbox"
+                  checked={notifications}
+                  onChange={() => setNotifications(!notifications)}
+                  className="w-5 h-5"
+                />
+              </label>
+            </div>
+          </div>
+
+          {/* Logout */}
+          <div className="pt-4 border-t border-white/20">
+            <button className="w-full px-4 py-2 text-white bg-red-500 rounded-lg hover:bg-red-600">
+              Logout
+            </button>
+          </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
