@@ -1,9 +1,18 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
+import GLBViewer from "../components/GLBViewer";
 
 export default function Learn() {
   const lessons = [
+    { id: "hand", title: "HAND", mediaType: "glb", src: "/video/hand.glb", caption: "3D Hand Animation", audio: null },
+    { id: "a", title: "A", mediaType: "video", src: "/video/A.mp4", caption: "Blender Letter A Animation", audio: "/audio/A.mp3" },
+    { id: "b", title: "B", mediaType: "video", src: "/video/B.mp4", caption: "Blender Letter B Animation", audio: "/audio/B.mp3" },
+    { id: "c", title: "C", mediaType: "video", src: "/video/C.mp4", caption: "Blender Letter C Animation", audio: "/audio/C.mp3" },
+    { id: "hey", title: "HEY", mediaType: "video", src: "/video/hey.mp4", caption: "Blender Hey Animation", audio: "/audio/hey.mp3" },
+    { id: "a-glb", title: "A (3D)", mediaType: "glb", src: "/video/A.glb", caption: "3D Letter A Model", audio: "/audio/A.mp3" },
+    { id: "b-glb", title: "B (3D)", mediaType: "glb", src: "/video/B.glb", caption: "3D Letter B Model", audio: "/audio/B.mp3" },
+    { id: "c-glb", title: "C (3D)", mediaType: "glb", src: "/video/C.glb", caption: "3D Letter C Model", audio: "/audio/C.mp3" },
     { id: "again", title: "AGAIN", mediaType: "video", src: "/video/again.mp4", caption: "Repeat or again.", audio: "/audio/again.mp4" },
     { id: "bye", title: "BYE", mediaType: "video", src: "/video/bye.mp4", caption: "Goodbye gesture.", audio: "/audio/bye.mp4" },
     { id: "deaf", title: "DEAF", mediaType: "video", src: "/video/deaf.mp4", caption: "Sign for deaf.", audio: "/audio/deaf.mp4" },
@@ -171,14 +180,18 @@ function TypeToLearn({ lessons = [] }) {
         >
           {matchingLesson.mediaType === 'gif' ? (
             <img src={matchingLesson.src} alt={matchingLesson.title} className="object-contain w-full h-[40vh]" />
-          ) : matchingLesson.src.endsWith('.glb') ? (
-            <div className="w-full h-[40vh] bg-gray-900 flex items-center justify-center">
-              <p className="text-white">3D Model: {matchingLesson.title}</p>
+          ) : matchingLesson.mediaType === 'glb' ? (
+            <div className="relative" key={matchingLesson.src}>
+              <GLBViewer src={matchingLesson.src} title={matchingLesson.title} />
+              <div className="absolute top-2 right-2 bg-blue-600 text-white px-2 py-1 rounded text-xs">
+                3D Interactive
+              </div>
             </div>
           ) : (
             <video 
               src={matchingLesson.src} 
               controls 
+              autoPlay
               className="object-contain w-full h-[40vh]"
               onPlay={() => {
                 if (matchingLesson.audio) {
@@ -188,13 +201,21 @@ function TypeToLearn({ lessons = [] }) {
               }}
             />
           )}
-          {matchingLesson.audio && (
-            <div className="p-3 bg-black/50">
-              <h3 className="text-lg font-bold text-white">{matchingLesson.title}</h3>
-              <p className="text-white/80 text-sm">{matchingLesson.caption}</p>
-              <p className="mt-1 text-xs text-blue-300">💡 Audio plays automatically with video</p>
-            </div>
-          )}
+          <div className="p-3 bg-black/50">
+            <h3 className="text-lg font-bold text-white">{matchingLesson.title}</h3>
+            <p className="text-white/80 text-sm">{matchingLesson.caption}</p>
+            {matchingLesson.audio && (
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-xs text-green-300">🔊 Audio plays automatically with video</span>
+                <button 
+                  onClick={() => new Audio(matchingLesson.audio).play()} 
+                  className="px-2 py-1 bg-blue-600 hover:bg-blue-500 rounded text-xs text-white"
+                >
+                  Replay Audio
+                </button>
+              </div>
+            )}
+          </div>
         </motion.div>
       )}
 
