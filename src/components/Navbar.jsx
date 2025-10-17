@@ -7,9 +7,9 @@ export default function Navbar() {
   const links = [
     { name: "Home", path: "/" },
     { name: "Flash Cards", path: "/flashcards" },
-   
+    { name: "Learn", path: "/learn" },
+    { name: "Live", path: "/live" },
     { name: "Quiz", path: "/quiz" },
-    { name: "Settings", path: "/settings" },
   ];
 
   return (

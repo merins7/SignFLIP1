@@ -1,39 +1,48 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 
-// ASL Quiz Questions (A, B, numbers as example)
-const questions = [
-  {
-    question: "Which letter does this ASL sign represent?",
-    image: "/signs/A.png", // Make sure it's inside public/signs/
-    options: ["A", "B", "C", "D"],
-    answer: "A",
-  },
-  {
-    question: "Which letter does this ASL sign represent?",
-    image: "/signs/B.png",
-    options: ["X", "B", "M", "Z"],
-    answer: "B",
-  },
-  {
-    question: "Which number does this ASL sign represent?",
-    image: "/signs/0.png",
-    options: ["0", "5", "3", "8"],
-    answer: "0",
-  },
-  {
-    question: "Which number does this ASL sign represent?",
-    image: "/signs/7.png",
-    options: ["1", "4", "6", "7"],
-    answer: "7",
-  },
-];
+// Generate ASL quiz questions dynamically (A-Z + 0-9)
+const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+const numbers = Array.from({ length: 10 }, (_, i) => i.toString());
+
+// Combine letters and numbers
+const aslItems = [...letters, ...numbers];
+
+// Function to create random quiz questions
+const generateQuiz = (numQuestions = 10) => {
+  const shuffled = aslItems.sort(() => 0.5 - Math.random());
+  const selected = shuffled.slice(0, numQuestions);
+  return selected.map((item) => ({
+    question: "Which ASL sign does this represent?",
+    image: `/signs/${item}.png`, // Make sure images are in public/signs/
+    options: shuffleOptions(item),
+    answer: item,
+  }));
+};
+
+// Function to generate options (one correct + 3 random)
+const shuffleOptions = (correct) => {
+  let options = [correct];
+  while (options.length < 4) {
+    const randomItem =
+      aslItems[Math.floor(Math.random() * aslItems.length)];
+    if (!options.includes(randomItem)) options.push(randomItem);
+  }
+  return options.sort(() => 0.5 - Math.random());
+};
 
 export default function Quiz() {
+  const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [showResult, setShowResult] = useState(false);
+  const progress = questions.length ? Math.round(((currentIndex) / questions.length) * 100) : 0;
+
+  // Generate quiz on component mount
+  useEffect(() => {
+    setQuestions(generateQuiz(10)); // 10 random questions
+  }, []);
 
   const handleOptionClick = (option) => {
     setSelectedOption(option);
@@ -54,31 +63,54 @@ export default function Quiz() {
   };
 
   const handleRestart = () => {
+    setQuestions(generateQuiz(10));
     setCurrentIndex(0);
     setScore(0);
     setSelectedOption(null);
     setShowResult(false);
   };
 
+  if (questions.length === 0) return null; // Wait until quiz is generated
+
   return (
-    <div className="relative min-h-screen text-white bg-gradient-to-br from-purple-600 via-pink-500 to-red-400">
+    <div
+      className="relative flex flex-col min-h-screen text-white"
+      style={{
+        backgroundImage: "url('/signs/image.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      {/* Overlay for readability */}
+      <div className="absolute inset-0 z-0 bg-black/60" />
+
       <Navbar />
-      <div className="flex flex-col items-center px-6 pt-28">
-        <h1 className="mb-6 text-3xl font-bold">ASL Quiz Section</h1>
+
+      <div className="relative z-10 flex flex-col items-center justify-start w-full px-6 py-20">
+        <h1 className="mb-8 text-4xl font-bold text-center text-yellow-300 drop-shadow-lg">
+          ASL Quiz Section
+        </h1>
 
         {!showResult ? (
-          <div className="w-full max-w-xl p-6 shadow-lg bg-white/10 rounded-2xl">
-            <h2 className="mb-4 text-xl font-semibold">
+          <div className="w-full max-w-3xl p-8 border shadow-2xl bg-white/10 backdrop-blur-md rounded-3xl border-white/20">
+            {/* Progress bar */}
+            <div className="w-full bg-white/20 h-3 rounded-full overflow-hidden mb-4">
+              <div className="h-full bg-yellow-400" style={{ width: `${progress}%` }} />
+            </div>
+            <h2 className="mb-2 text-xl font-semibold text-center">
               {questions[currentIndex].question}
             </h2>
 
-            {/* Show ASL image */}
+            {/* ASL Sign Image */}
             <div className="flex justify-center mb-6">
-              <img
-                src={questions[currentIndex].image}
-                alt="ASL sign"
-                className="object-contain w-40 h-40 bg-white rounded-lg shadow-md"
-              />
+              <div className="w-full h-[60vh] md:h-[70vh] overflow-hidden rounded-2xl bg-black shadow-2xl">
+                <img
+                  src={questions[currentIndex].image}
+                  alt="ASL sign"
+                  className="object-cover object-center w-full h-full"
+                />
+              </div>
             </div>
 
             {/* Options */}
@@ -87,9 +119,11 @@ export default function Quiz() {
                 <button
                   key={index}
                   onClick={() => handleOptionClick(option)}
-                  className={`px-4 py-2 rounded-lg border transition ${
+                  className={`px-4 py-3 rounded-lg border font-medium transition ${
                     selectedOption === option
-                      ? "bg-blue-600 text-white border-blue-700"
+                      ? (option === questions[currentIndex].answer
+                          ? "bg-green-600 text-white border-green-700 shadow-md"
+                          : "bg-red-600 text-white border-red-700 shadow-md")
                       : "bg-white/20 text-white hover:bg-white/30 border-white/40"
                   }`}
                 >
@@ -103,9 +137,9 @@ export default function Quiz() {
               <button
                 onClick={handleNext}
                 disabled={!selectedOption}
-                className={`px-6 py-2 rounded-lg font-semibold transition ${
+                className={`px-6 py-3 rounded-lg font-semibold transition ${
                   selectedOption
-                    ? "bg-green-500 hover:bg-green-600 text-white"
+                    ? "bg-yellow-500 hover:bg-yellow-400 text-white shadow-lg"
                     : "bg-gray-400 cursor-not-allowed"
                 }`}
               >
@@ -114,15 +148,17 @@ export default function Quiz() {
             </div>
           </div>
         ) : (
-          <div className="w-full max-w-md p-6 text-center shadow-lg bg-white/10 rounded-2xl">
-            <h2 className="mb-4 text-2xl font-bold">Quiz Completed 🎉</h2>
-            <p className="mb-4 text-lg">
+          <div className="w-full max-w-md p-8 text-center border shadow-2xl bg-white/10 backdrop-blur-md rounded-3xl border-white/20">
+            <h2 className="mb-4 text-2xl font-bold text-yellow-300">
+              Quiz Completed 🎉
+            </h2>
+            <p className="mb-6 text-lg">
               You scored <span className="font-bold">{score}</span> out of{" "}
               {questions.length}
             </p>
             <button
               onClick={handleRestart}
-              className="px-6 py-2 font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+              className="px-6 py-3 font-semibold text-white bg-green-500 rounded-lg shadow-md hover:bg-green-600"
             >
               Restart Quiz
             </button>

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BookOpen, HelpCircle, Settings, Home as HomeIcon } from "lucide-react";
+import { BookOpen, HelpCircle, Home as HomeIcon, PlayCircle, Camera } from "lucide-react";
 
 export default function Home() {
   return (
@@ -37,8 +37,9 @@ export default function Home() {
           {[
             { to: "/", label: "Home", icon: <HomeIcon className="w-6 h-6" /> },
             { to: "/flashcards", label: "Flash Cards", icon: <BookOpen className="w-6 h-6" /> },
+            { to: "/learn", label: "Learn", icon: <PlayCircle className="w-6 h-6" /> },
+            { to: "/live", label: "Live", icon: <Camera className="w-6 h-6" /> },
             { to: "/quiz", label: "Quiz", icon: <HelpCircle className="w-6 h-6" /> },
-            { to: "/settings", label: "Settings", icon: <Settings className="w-6 h-6" /> },
           ].map((item, i) => (
             <Link
               key={i}

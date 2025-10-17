@@ -4,8 +4,9 @@ import FlashCards from "./pages/FlashCards";
 
 import Quiz from "./pages/Quiz";
 
-import Settings from "./pages/Settings";
 import Navbar from "./components/Navbar"; // ✅ import Navbar
+import Learn from "./pages/Learn";
+import Live from "./pages/Live";
 
 export default function App() {
   return (
@@ -19,7 +20,8 @@ export default function App() {
         <Route path="/flashcards" element={<FlashCards />} />
         
         <Route path="/quiz" element={<Quiz />} />
-        <Route path="/settings" element={<Settings />} />
+        <Route path="/learn" element={<Learn />} />
+        <Route path="/live" element={<Live />} />
       </Routes>
     </Router>
   );
